@@ -1,4 +1,4 @@
-package com.v2soft.androidcursor.domain;
+package com.v2soft.androidcursor.test;
 
 import android.provider.ContactsContract;
 

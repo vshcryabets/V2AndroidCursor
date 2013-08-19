@@ -15,7 +15,7 @@ public class TestData {
     public static final String FIELD_DOUBLE = "double";
     public static final String FIELD_SHORT = "short";
     public static final String FIELD_LONG = "long";
-    
+
     @CursorDataAnnotation(columnName=FIELD_INT)
     private int mIntValue;
     @CursorDataAnnotation(columnName=FIELD_BOOLEAN)
@@ -26,7 +26,7 @@ public class TestData {
     private float mFloatValue;
     @CursorDataAnnotation(columnName=FIELD_DOUBLE)
     private double mDoubleValue;
-    
+
     public int getIntValue() {
         return mIntValue;
     }
@@ -56,5 +56,21 @@ public class TestData {
     }
     public void setDoubleValue(double mDoubleValue) {
         this.mDoubleValue = mDoubleValue;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if ( o == null ) {
+            return false;
+        }
+        if( o instanceof TestData ) {
+            TestData item = (TestData) o;
+            return mBooleanValue == item.mBooleanValue &&
+                    mIntValue == item.mIntValue &&
+                    mStringValue.equals(item.mStringValue) &&
+                    Math.abs(mDoubleValue-item.mDoubleValue)< 0.01 &&
+                    Math.abs(mFloatValue- item.mFloatValue) < 0.01;
+        }
+        // TODO Auto-generated method stub
+        return false;
     }
 }

@@ -27,8 +27,9 @@ public class TestContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        // TODO Auto-generated method stub
-        return 0;
+        int i = Integer.parseInt(selection);
+        mData.remove(i);
+        return 1;
     }
 
     @Override
@@ -45,7 +46,7 @@ public class TestContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        TestData item = mDao.itemFromContentValues2(values);
+        TestData item = mDao.itemFromContentValues(values);
         mData.add(item);
         Uri newRow = Uri.parse(CONTENT_URI.toString() + "/" + (mData.size()-1));
         return newRow;
@@ -69,22 +70,24 @@ public class TestContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
             String[] selectionArgs, String sortOrder) {
-            switch (uriMatcher.match(uri)){
-            case MINERALS:
-                return new TestDataCursor(mData);
-            case MINERAL_ID:                
-                int i = Integer.parseInt(uri.getLastPathSegment());
-                return new TestDataCursor(new ArrayList<TestData>(mData.subList(i, i)));
-            default:
-                throw new IllegalArgumentException("Unsupported URI: " + uri);
-            }
+        switch (uriMatcher.match(uri)){
+        case MINERALS:
+            return new TestDataCursor(mData);
+        case MINERAL_ID:                
+            int i = Integer.parseInt(uri.getLastPathSegment());
+            return new TestDataCursor(new ArrayList<TestData>(mData.subList(i, i)));
+        default:
+            throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
-
-        @Override
-        public int update(Uri uri, ContentValues values, String selection,
-                String[] selectionArgs) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
     }
+
+    @Override
+    public int update(Uri uri, ContentValues values, String selection,
+            String[] selectionArgs) {
+        int i = Integer.parseInt(selection);
+        TestData item = mDao.itemFromContentValues(values);
+        mData.set(i, item);
+        return 1;
+    }
+
+}

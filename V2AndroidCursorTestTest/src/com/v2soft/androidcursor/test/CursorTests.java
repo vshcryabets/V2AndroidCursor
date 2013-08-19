@@ -2,6 +2,7 @@ package com.v2soft.androidcursor.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -63,14 +64,46 @@ public class CursorTests extends AndroidTestCase {
             item.setIntValue(i*3);
             item.setStringValue("String "+i);
             resolver.insert(TestContentProvider.CONTENT_URI, dao.itemToContentValues(item));
+            origin.add(item);
         }
-        // read list
+        // read and check list
         cursor = resolver.query(TestContentProvider.CONTENT_URI,
                 null, null, null, null);
         items = dao.getListFromCursor(cursor);
         cursor.close();
         assertNotNull("No items", items);
         assertTrue("Wrong items count", items.size() == 10);
-
+        // test items
+        for (TestData item : origin) {
+            assertTrue("Can't find item "+item.getIntValue(), items.contains(item));
+        }
+        // test update
+        int position = items.size()/2;
+        TestData modifiedItem = items.get(position);
+        modifiedItem.setBooleanValue(false);
+        modifiedItem.setDoubleValue(123.456);
+        modifiedItem.setFloatValue(894.345f);
+        modifiedItem.setIntValue(232434234);
+        modifiedItem.setStringValue(UUID.randomUUID().toString());
+        resolver.update(TestContentProvider.CONTENT_URI, dao.itemToContentValues(modifiedItem), String.valueOf(position), null);
+        origin.set(position, modifiedItem);
+        cursor = resolver.query(TestContentProvider.CONTENT_URI,
+                null, null, null, null);
+        items = dao.getListFromCursor(cursor);
+        cursor.close();
+        for (TestData item : origin) {
+            assertTrue("Can't find item "+item.getIntValue(), items.contains(item));
+        }
+        // delete all items
+        for ( int i = items.size(); i > 0 ; i -- ) {
+            resolver.delete(TestContentProvider.CONTENT_URI, String.valueOf(i-1), null);
+        }
+        // read and check list
+        cursor = resolver.query(TestContentProvider.CONTENT_URI,
+                null, null, null, null);
+        items = dao.getListFromCursor(cursor);
+        cursor.close();
+        assertNotNull("No items", items);
+        assertTrue("List should be empty", items.size() == 0);
     }
 }

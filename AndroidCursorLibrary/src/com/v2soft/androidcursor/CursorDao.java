@@ -55,14 +55,7 @@ public class CursorDao<T> {
                         String value = cursor.getString(cursor.getColumnIndex(columnName));
                         //cursor.getColumnIndex(columnName)
                         //cursor.getType(columnIndex)
-                        Class<?> dataType = field.getType();
-                        if ( dataType.equals(String.class)) {
-                            field.setAccessible(true);
-                            field.set(item, value);
-                        } else if ( dataType.equals(int.class)) {
-                            field.setAccessible(true);
-                            field.set(item, Integer.parseInt(value));
-                        }
+                        setFieldValue(field, value, item);
                     }
                 }
             } catch (IllegalArgumentException e) {
@@ -81,7 +74,7 @@ public class CursorDao<T> {
      * @param values
      * @return
      */
-    public T itemFromContentValues2(ContentValues values) {
+    public T itemFromContentValues(ContentValues values) {
         final T item = mFactory.newItem();
         // process fields
         final Field[] fields = mTypeClass.getDeclaredFields();
@@ -95,14 +88,7 @@ public class CursorDao<T> {
                     String value= values.getAsString(columnName);
                     //cursor.getColumnIndex(columnName)
                     //cursor.getType(columnIndex)
-                    Class<?> dataType = field.getType();
-                    if ( dataType.equals(String.class)) {
-                        field.setAccessible(true);
-                        field.set(item, value);
-                    } else if ( dataType.equals(int.class)) {
-                        field.setAccessible(true);
-                        field.set(item, Integer.parseInt(value));
-                    }
+                    setFieldValue(field, value, item);
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -113,6 +99,25 @@ public class CursorDao<T> {
             e.printStackTrace();
         }
         return item;
+    }
+    private void setFieldValue(Field field, String value, T item) throws IllegalArgumentException, IllegalAccessException {
+        Class<?> dataType = field.getType();
+        if ( dataType.equals(String.class)) {
+            field.setAccessible(true);
+            field.set(item, value);
+        } else if ( dataType.equals(int.class)) {
+            field.setAccessible(true);
+            field.set(item, Integer.parseInt(value));
+        } else if ( dataType.equals(boolean.class)) {
+            field.setAccessible(true);
+            field.set(item, Boolean.parseBoolean(value));
+        } else if ( dataType.equals(double.class)) {
+            field.setAccessible(true);
+            field.set(item, Double.parseDouble(value));
+        } else if ( dataType.equals(float.class)) {
+            field.setAccessible(true);
+            field.set(item, Float.parseFloat(value));
+        }
     }
     /**
      * Convert item to ContentValue object.
@@ -130,6 +135,7 @@ public class CursorDao<T> {
                     final CursorDataAnnotation annotation = 
                             field.getAnnotation(CursorDataAnnotation.class);
                     String columnName = annotation.columnName();
+                    field.setAccessible(true);
                     String value= field.get(item).toString();
                     result.put(columnName, value);
                 }

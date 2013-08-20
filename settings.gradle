@@ -1,0 +1,2 @@
+include ':AndroidCursorLibrary'
+include ':AndroidCursorSample'

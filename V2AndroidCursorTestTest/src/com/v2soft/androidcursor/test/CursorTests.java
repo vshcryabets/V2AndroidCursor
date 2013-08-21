@@ -10,6 +10,7 @@ import android.provider.ContactsContract;
 import android.test.AndroidTestCase;
 
 import com.v2soft.androidcursor.CursorDao;
+import com.v2soft.androidcursorsample.Contact;
 import com.v2soft.androidcursorsample.TestContentProvider;
 import com.v2soft.androidcursorsample.TestData;
 

@@ -1,9 +1,20 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/txtContact"
-    android:paddingBottom="7dp"
-    android:paddingLeft="14dp"
-    android:paddingRight="14dp"
-    android:paddingTop="7dp"
-    />
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:id="@+id/imgContact"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@android:drawable/ic_dialog_info" />
+
+    <TextView
+        android:id="@+id/txtContact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="7dp"
+        android:paddingLeft="14dp"
+        android:paddingRight="14dp"
+        android:paddingTop="7dp" />
+
+</LinearLayout>

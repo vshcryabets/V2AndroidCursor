@@ -29,6 +29,7 @@ public class TestContentProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int i = Integer.parseInt(selection);
         mData.remove(i);
+        getContext().getContentResolver().notifyChange(uri, null);
         return 1;
     }
 
@@ -49,6 +50,7 @@ public class TestContentProvider extends ContentProvider {
         TestData item = mDao.itemFromContentValues(values);
         mData.add(item);
         Uri newRow = Uri.parse(CONTENT_URI.toString() + "/" + (mData.size()-1));
+        getContext().getContentResolver().notifyChange(uri, null);
         return newRow;
     }
 
@@ -87,6 +89,7 @@ public class TestContentProvider extends ContentProvider {
         int i = Integer.parseInt(selection);
         TestData item = mDao.itemFromContentValues(values);
         mData.set(i, item);
+        getContext().getContentResolver().notifyChange(uri, null);
         return 1;
     }
 

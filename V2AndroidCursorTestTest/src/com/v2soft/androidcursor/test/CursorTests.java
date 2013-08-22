@@ -6,11 +6,13 @@ import java.util.UUID;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.test.AndroidTestCase;
 
 import com.v2soft.androidcursor.CursorDao;
 import com.v2soft.androidcursorsample.Contact;
+import com.v2soft.androidcursorsample.TestContentObserver;
 import com.v2soft.androidcursorsample.TestContentProvider;
 import com.v2soft.androidcursorsample.TestData;
 
@@ -43,6 +45,9 @@ public class CursorTests extends AndroidTestCase {
      */
     public void testDataTypes() {
         ContentResolver resolver = mContext.getContentResolver();
+        TestContentObserver observer = new TestContentObserver(new Handler());
+        resolver.registerContentObserver(TestContentProvider.CONTENT_URI, true, observer);
+        
         CursorDao<TestData> dao = new CursorDao<TestData>(TestData.class, new CursorDao.Factory<TestData>(){
             @Override
             public TestData newItem() {
@@ -106,5 +111,7 @@ public class CursorTests extends AndroidTestCase {
         cursor.close();
         assertNotNull("No items", items);
         assertTrue("List should be empty", items.size() == 0);
+        
+        resolver.unregisterContentObserver(observer);
     }
 }

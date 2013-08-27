@@ -2,6 +2,7 @@ package com.v2soft.androidcursor.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import android.content.ContentResolver;
@@ -45,21 +46,14 @@ public class CursorTests extends AndroidTestCase {
      */
     public void testDataTypes() {
         ContentResolver resolver = mContext.getContentResolver();
-        TestContentObserver observer = new TestContentObserver(new Handler());
-        resolver.registerContentObserver(TestContentProvider.CONTENT_URI, true, observer);
-        
         CursorDao<TestData> dao = new CursorDao<TestData>(TestData.class, new CursorDao.Factory<TestData>(){
             @Override
             public TestData newItem() {
                 return new TestData();
             }
         }, 1);
-        Cursor cursor = resolver.query(TestContentProvider.CONTENT_URI,
-                null, null, null, null);
-        List<TestData> items = dao.getListFromCursor(cursor);
-        cursor.close();
-        assertNotNull("No items", items);
-        assertTrue("Items list should be empty", items.size() < 1);
+        deleteAllItems(resolver);
+        
         // prepare items
         List<TestData> origin = new ArrayList<TestData>();
         for ( int i = 0; i< 10; i++ ) {
@@ -72,10 +66,11 @@ public class CursorTests extends AndroidTestCase {
             resolver.insert(TestContentProvider.CONTENT_URI, dao.itemToContentValues(item));
             origin.add(item);
         }
+        
         // read and check list
-        cursor = resolver.query(TestContentProvider.CONTENT_URI,
+        Cursor cursor = resolver.query(TestContentProvider.CONTENT_URI,
                 null, null, null, null);
-        items = dao.getListFromCursor(cursor);
+        List<TestData> items = dao.getListFromCursor(cursor);
         cursor.close();
         assertNotNull("No items", items);
         assertTrue("Wrong items count", items.size() == 10);
@@ -100,10 +95,7 @@ public class CursorTests extends AndroidTestCase {
         for (TestData item : origin) {
             assertTrue("Can't find item "+item.getIntValue(), items.contains(item));
         }
-        // delete all items
-        for ( int i = items.size(); i > 0 ; i -- ) {
-            resolver.delete(TestContentProvider.CONTENT_URI, String.valueOf(i-1), null);
-        }
+        deleteAllItems(resolver);
         // read and check list
         cursor = resolver.query(TestContentProvider.CONTENT_URI,
                 null, null, null, null);
@@ -111,7 +103,46 @@ public class CursorTests extends AndroidTestCase {
         cursor.close();
         assertNotNull("No items", items);
         assertTrue("List should be empty", items.size() == 0);
+    }
+    
+    private void deleteAllItems(ContentResolver resolver) {
+        Cursor cursor = resolver.query(TestContentProvider.CONTENT_URI,
+                null, null, null, null);
+        int size = cursor.getCount();
+        cursor.close();
+        // delete all items
+        for ( int i = size; i > 0 ; i -- ) {
+            resolver.delete(TestContentProvider.CONTENT_URI, String.valueOf(i-1), null);
+        }
+    }
+
+    /**
+     * Test content observer functionality.
+     * @author V.Shcryabets<vshcryabets@gmail.com>
+     */
+    public void testContentObserver() {
+        ContentResolver resolver = mContext.getContentResolver();
+        CursorDao<TestData> dao = new CursorDao<TestData>(TestData.class, new CursorDao.Factory<TestData>(){
+            @Override
+            public TestData newItem() {
+                return new TestData();
+            }
+        }, 1);
+
+        deleteAllItems(resolver);
+        TestContentObserver observer = new TestContentObserver(null);
+        resolver.registerContentObserver(TestContentProvider.CONTENT_URI, true, observer);
+        int testRecordsCount = new Random().nextInt(100);
+        for ( int i = 0; i< testRecordsCount; i++ ) {
+            TestData item = new TestData();
+            item.setDoubleValue(((double)i)/10.0);
+            item.setStringValue("String "+i);
+            resolver.insert(TestContentProvider.CONTENT_URI, dao.itemToContentValues(item));
+        }
+        assertTrue("Content observer wasn't notified", testRecordsCount == observer.getChangeCount());
+        deleteAllItems(resolver);
         
         resolver.unregisterContentObserver(observer);
+        assertTrue("Content observer wasn't notified", observer.isOnChangeCalled());
     }
 }

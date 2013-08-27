@@ -10,7 +10,6 @@ import com.v2soft.androidcursor.CursorDataAnnotation;
 public class Contact {
     @CursorDataAnnotation(columnName=ContactsContract.Contacts._ID)
     private int mId;
-
     @CursorDataAnnotation(columnName=ContactsContract.Contacts.DISPLAY_NAME)
     private String mName;
     @CursorDataAnnotation(columnName=ContactsContract.Contacts.PHOTO_THUMBNAIL_URI)

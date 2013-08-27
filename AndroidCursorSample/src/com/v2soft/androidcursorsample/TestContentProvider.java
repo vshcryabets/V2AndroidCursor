@@ -72,15 +72,21 @@ public class TestContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
             String[] selectionArgs, String sortOrder) {
+        Cursor result = null;
         switch (uriMatcher.match(uri)){
         case MINERALS:
-            return new TestDataCursor(mData);
+            result = new TestDataCursor(mData);
+            result.setNotificationUri(getContext().getContentResolver(), CONTENT_URI);
+            break;
         case MINERAL_ID:                
             int i = Integer.parseInt(uri.getLastPathSegment());
-            return new TestDataCursor(new ArrayList<TestData>(mData.subList(i, i)));
+            result = new TestDataCursor(new ArrayList<TestData>(mData.subList(i, i)));
+            result.setNotificationUri(getContext().getContentResolver(), CONTENT_URI);
+            break;
         default:
             throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
+        return result;
     }
 
     @Override

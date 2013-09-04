@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.os.Handler;
 import android.provider.ContactsContract;
 import android.test.AndroidTestCase;
 
@@ -33,7 +32,7 @@ public class CursorTests extends AndroidTestCase {
             public Contact newItem() {
                 return new Contact();
             }
-        }, 1);
+        });
         List<Contact> contacts = dao.getListFromCursor(cursor);
         cursor.close();
         assertNotNull("No contacts", contacts);
@@ -51,9 +50,9 @@ public class CursorTests extends AndroidTestCase {
             public TestData newItem() {
                 return new TestData();
             }
-        }, 1);
+        });
         deleteAllItems(resolver);
-        
+
         // prepare items
         List<TestData> origin = new ArrayList<TestData>();
         for ( int i = 0; i< 10; i++ ) {
@@ -62,11 +61,15 @@ public class CursorTests extends AndroidTestCase {
             item.setDoubleValue(((double)i)/10.0);
             item.setFloatValue(((float)i)/20.0f);
             item.setIntValue(i*3);
-            item.setStringValue("String "+i);
+            if ( i == 0 ) {
+                item.setStringValue(null);
+            } else {
+                item.setStringValue("String "+i);
+            }
             resolver.insert(TestContentProvider.CONTENT_URI, dao.itemToContentValues(item));
             origin.add(item);
         }
-        
+
         // read and check list
         Cursor cursor = resolver.query(TestContentProvider.CONTENT_URI,
                 null, null, null, null);
@@ -104,7 +107,7 @@ public class CursorTests extends AndroidTestCase {
         assertNotNull("No items", items);
         assertTrue("List should be empty", items.size() == 0);
     }
-    
+
     private void deleteAllItems(ContentResolver resolver) {
         Cursor cursor = resolver.query(TestContentProvider.CONTENT_URI,
                 null, null, null, null);
@@ -127,7 +130,7 @@ public class CursorTests extends AndroidTestCase {
             public TestData newItem() {
                 return new TestData();
             }
-        }, 1);
+        });
 
         deleteAllItems(resolver);
         TestContentObserver observer = new TestContentObserver(null);
@@ -141,7 +144,7 @@ public class CursorTests extends AndroidTestCase {
         }
         assertTrue("Content observer wasn't notified", testRecordsCount == observer.getChangeCount());
         deleteAllItems(resolver);
-        
+
         resolver.unregisterContentObserver(observer);
         assertTrue("Content observer wasn't notified", observer.isOnChangeCalled());
     }

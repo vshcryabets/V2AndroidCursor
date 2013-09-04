@@ -15,6 +15,7 @@ public class TestData {
     public static final String FIELD_DOUBLE = "double";
     public static final String FIELD_SHORT = "short";
     public static final String FIELD_LONG = "long";
+    public static final String FIELD_DATE = "date";
 
     @CursorDataAnnotation(columnName=FIELD_INT)
     private int mIntValue;
@@ -26,6 +27,8 @@ public class TestData {
     private float mFloatValue;
     @CursorDataAnnotation(columnName=FIELD_DOUBLE)
     private double mDoubleValue;
+    //    @CursorDataAnnotation(columnName=FIELD_DATE)
+    private double mDateValue;
 
     public int getIntValue() {
         return mIntValue;
@@ -66,11 +69,11 @@ public class TestData {
             TestData item = (TestData) o;
             return mBooleanValue == item.mBooleanValue &&
                     mIntValue == item.mIntValue &&
-                    mStringValue.equals(item.mStringValue) &&
+                    ( (mStringValue == null && item.mStringValue == null) || 
+                            ( mStringValue != null && mStringValue.equals(item.mStringValue))) &&
                     Math.abs(mDoubleValue-item.mDoubleValue)< 0.01 &&
                     Math.abs(mFloatValue- item.mFloatValue) < 0.01;
         }
-        // TODO Auto-generated method stub
         return false;
     }
 }

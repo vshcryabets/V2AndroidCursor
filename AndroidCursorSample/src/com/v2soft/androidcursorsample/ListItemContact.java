@@ -35,7 +35,7 @@ public class ListItemContact extends LinearLayout {
         p.setIntrinsicHeight(40);
         p.setIntrinsicWidth(40);
         p.setCornerRadius(6);
-        mPhoto.setBackgroundDrawable(p);
+//        mPhoto.setBackgroundDrawable(p);
     }
 
     public Contact getData() {

@@ -68,7 +68,7 @@ public class TestDataCursor extends AbstractCursor {
         case 2:
             return String.valueOf(mData.get(this.mPos).isBooleanValue());
         case 3:
-            return String.valueOf(mData.get(this.mPos).getStringValue());
+            return mData.get(this.mPos).getStringValue();
         case 4:
             return String.valueOf(mData.get(this.mPos).getFloatValue());
         case 5:

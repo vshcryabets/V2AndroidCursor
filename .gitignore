@@ -1,6 +1,8 @@
-build
-dist
 bin
 gen
+target
+.settings
+local.properties
+libs
+build
 .gradle/
-.idea/

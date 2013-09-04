@@ -61,7 +61,7 @@ public class TestContentProvider extends ContentProvider {
             public TestData newItem() {
                 return new TestData();
             }
-        }, 1);
+        });
         mData = new ArrayList<TestData>();
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, "minerals", MINERALS);

@@ -45,7 +45,7 @@ public class CursorDao<T> {
      * @param typeClass
      * @param factory construction factory implementation.
      */
-    public CursorDao(Class<T> typeClass, Factory<T> factory, int qwe) {
+    public CursorDao(Class<T> typeClass, Factory<T> factory) {
         mTypeClass = typeClass;
         mFactory = factory;
     }
@@ -100,10 +100,7 @@ public class CursorDao<T> {
                     final CursorDataAnnotation annotation = 
                             field.getAnnotation(CursorDataAnnotation.class);
                     String columnName = annotation.columnName();
-                    String value= values.getAsString(columnName);
-                    //cursor.getColumnIndex(columnName)
-                    //cursor.getType(columnIndex)
-                    setFieldValue(field, value, item);
+                    setFieldValueFromContentValues(field, columnName, item, values);
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -134,6 +131,25 @@ public class CursorDao<T> {
             field.set(item, Float.parseFloat(value));
         }
     }
+    private void setFieldValueFromContentValues(Field field, String columnName, T item, ContentValues values) throws IllegalArgumentException, IllegalAccessException {
+        Class<?> dataType = field.getType();
+        if ( dataType.equals(String.class)) {
+            field.setAccessible(true);
+            field.set(item, values.getAsString(columnName));
+        } else if ( dataType.equals(int.class)) {
+            field.setAccessible(true);
+            field.set(item, values.getAsInteger(columnName));
+        } else if ( dataType.equals(boolean.class)) {
+            field.setAccessible(true);
+            field.set(item, values.getAsBoolean(columnName));
+        } else if ( dataType.equals(double.class)) {
+            field.setAccessible(true);
+            field.set(item, values.getAsDouble(columnName));
+        } else if ( dataType.equals(float.class)) {
+            field.setAccessible(true);
+            field.set(item, values.getAsFloat(columnName));
+        }
+    }
     /**
      * Convert item to ContentValue object.
      * @param item
@@ -151,8 +167,13 @@ public class CursorDao<T> {
                             field.getAnnotation(CursorDataAnnotation.class);
                     String columnName = annotation.columnName();
                     field.setAccessible(true);
-                    String value= field.get(item).toString();
-                    result.put(columnName, value);
+                    Object fieldValue = field.get(item);
+                    if ( fieldValue == null ) {
+//                        result.putNull(columnName);
+                    } else {
+                        String value = fieldValue.toString();
+                        result.put(columnName, value);
+                    }
                 }
             }
         } catch (IllegalArgumentException e) {

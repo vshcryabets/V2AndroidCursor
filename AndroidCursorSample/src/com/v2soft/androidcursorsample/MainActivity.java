@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
                 public Contact newItem() {
                     return new Contact();
                 }
-            }, 1);
+            });
             List<Contact> contacts = dao.getListFromCursor(cursor);
             cursor.close();
             ContactsAdapter adapter = new ContactsAdapter(this, contacts);

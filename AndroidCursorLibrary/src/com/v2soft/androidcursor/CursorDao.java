@@ -17,6 +17,7 @@ package com.v2soft.androidcursor;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -68,8 +69,6 @@ public class CursorDao<T> {
                                 field.getAnnotation(CursorDataAnnotation.class);
                         String columnName = annotation.columnName();
                         String value = cursor.getString(cursor.getColumnIndex(columnName));
-                        //cursor.getColumnIndex(columnName)
-                        //cursor.getType(columnIndex)
                         setFieldValue(field, value, item);
                     }
                 }
@@ -148,6 +147,9 @@ public class CursorDao<T> {
         } else if ( dataType.equals(float.class)) {
             field.setAccessible(true);
             field.set(item, values.getAsFloat(columnName));
+        } else if ( dataType.equals(Date.class)) {
+            field.setAccessible(true);
+            field.set(item, new Date(values.getAsLong(columnName)));
         }
     }
     /**
@@ -168,12 +170,7 @@ public class CursorDao<T> {
                     String columnName = annotation.columnName();
                     field.setAccessible(true);
                     Object fieldValue = field.get(item);
-                    if ( fieldValue == null ) {
-//                        result.putNull(columnName);
-                    } else {
-                        String value = fieldValue.toString();
-                        result.put(columnName, value);
-                    }
+                    setContentValuesFromField(fieldValue, result, columnName);
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -184,5 +181,25 @@ public class CursorDao<T> {
             e.printStackTrace();
         }
         return result;
+    }
+    private void setContentValuesFromField(Object field,
+            ContentValues result, String columnName) {
+        if ( field == null ) {
+            return;
+        }
+        Class<?> dataType = field.getClass();
+        if ( dataType.equals(String.class)) {
+            result.put(columnName, (String)field);
+        } else if ( dataType.equals(Integer.class)) {
+            result.put(columnName, (Integer)field);
+        } else if ( dataType.equals(Boolean.class)) {
+            result.put(columnName, (Boolean)field);
+        } else if ( dataType.equals(Double.class)) {
+            result.put(columnName, (Double)field);
+        } else if ( dataType.equals(Float.class)) {
+            result.put(columnName, (Float)field);
+        } else if ( dataType.equals(Date.class)) {
+            result.put(columnName, ((Date)field).getTime());
+        }
     }
 }
